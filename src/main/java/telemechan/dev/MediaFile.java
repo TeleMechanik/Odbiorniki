@@ -2,18 +2,19 @@ package telemechan.dev;
 
 import lombok.Getter;
 
-import java.awt.image.BufferedImage;
+import java.io.File;
+@Getter
+public class MediaFile {
+    private File file;
+    private MediaType type;
 
-public class ImageHandler {
-    public enum type{
-        IMAGE,
-        GIF,
-        VIDEO
+    public MediaFile(File file, MediaType type) {
+        this.file = file;
+        this.type = type;
     }
+}
 
-    @Getter
-    private BufferedImage image;
-
-    private
-
+enum MediaType {
+    IMAGE,
+    UNKNOWN, GIF, VIDEO
 }
