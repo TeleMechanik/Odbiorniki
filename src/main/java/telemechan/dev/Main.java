@@ -1,17 +1,25 @@
 package telemechan.dev;
 
+import jakarta.websocket.ContainerProvider;
+import jakarta.websocket.DeploymentException;
+import jakarta.websocket.Session;
+import jakarta.websocket.WebSocketContainer;
 import lombok.Getter;
 import lombok.Setter;
-import uk.co.caprica.vlcj.media.MediaEventAdapter;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
+import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaHandler;
+import telemechan.dev.media.MediaType;
+import telemechan.dev.servercon.Endpoint;
+import telemechan.dev.servercon.PacketHandler;
+import telemechan.dev.servercon.PacketParser;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+
 
 public class Main {
     @Getter
@@ -21,7 +29,13 @@ public class Main {
     static MediaHandler mediaHandler;
 
     static int width, height;
-    static JComponent currentComponent; // keep track of displayed component
+    static JComponent currentComponent;
+
+    @Getter
+    static Session session;
+
+    @Getter
+    static PacketParser parser;
 
     public static void main(String[] args) {
         try {
@@ -42,7 +56,7 @@ public class Main {
         height = (int) screenSize.getHeight();
         mainFrame.setBounds(center.x - width / 2, center.y - height / 2, width, height);
 
-        mainFrame.setLayout(new BorderLayout()); // important
+        mainFrame.setLayout(new BorderLayout());
 
         mediaHandler = new MediaHandler(new MediaFile(new File("C:/Users/stasd/Downloads/1459929400_454.jpg"), MediaType.IMAGE));
         currentComponent = mediaHandler.getMediaComponent(width, height);
@@ -53,10 +67,22 @@ public class Main {
         mainFrame.setVisible(true);
 
         KeyboardHandler.registerBinds();
+
+        parser = new PacketParser();
+        parser.registerHandler(new PacketHandler());
+
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
+        container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
+        String url = "ws://se01.creperus.top:10210/";
+        try {
+            session = container.connectToServer(Endpoint.class, URI.create(url));
+        } catch (DeploymentException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static void updateMainFrame(MediaFile mediaFile){
-        // remove the currently displayed component
         if (currentComponent != null) {
             if(currentComponent instanceof EmbeddedMediaPlayerComponent component){
                 component.mediaPlayer().controls().stop();
@@ -64,7 +90,6 @@ public class Main {
             mainFrame.getContentPane().remove(currentComponent);
         }
 
-        // create new media handler and component
         mediaHandler = new MediaHandler(mediaFile);
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
@@ -75,8 +100,8 @@ public class Main {
         if(currentComponent instanceof EmbeddedMediaPlayerComponent component){
             component.mediaPlayer().media().play(
                     mediaFile.getFile().getAbsolutePath(),
-                    ":input-repeat=65535",   // infinite loop
-                    ":no-audio"              // mute
+                    ":input-repeat=65535",
+                    ":no-audio"
             );
 
             component.setFocusable(false);

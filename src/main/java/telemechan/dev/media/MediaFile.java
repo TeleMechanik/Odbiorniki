@@ -1,4 +1,4 @@
-package telemechan.dev;
+package telemechan.dev.media;
 
 import lombok.Getter;
 
@@ -14,7 +14,3 @@ public class MediaFile {
     }
 }
 
-enum MediaType {
-    IMAGE,
-    UNKNOWN, GIF, VIDEO
-}

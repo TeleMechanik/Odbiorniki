@@ -1,5 +1,9 @@
 package telemechan.dev;
 
+import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaHandler;
+import telemechan.dev.media.MediaType;
+
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -8,6 +12,7 @@ import java.io.File;
 public class SettingsPanel extends JDialog {
 
     public SettingsPanel() {
+        setTitle("Ustawienia");
         setSize(300, 200);
         setLocationRelativeTo(Main.getMainFrame());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
@@ -16,26 +21,14 @@ public class SettingsPanel extends JDialog {
 
         JButton button = new JButton("test");
 
-        button.addActionListener(a -> {
+        button.addActionListener(_ -> {
             JFileChooser fileChooser = getFileChooser();
 
             int r = fileChooser.showOpenDialog(null);
             if(r == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
 
-                String name = file.getName();
-                int dot = name.lastIndexOf('.');
-                String ext = (dot == -1) ? "" : name.substring(dot + 1);
-
-                MediaType type;
-                switch (ext.toLowerCase()) {
-                    case  "jpg", "jpeg", "png" -> type = MediaType.IMAGE;
-                    case  "gif" -> type = MediaType.GIF;
-                    case  "mp4", "mov" -> type = MediaType.VIDEO;
-                    default -> type = MediaType.UNKNOWN;
-                }
-
-                Main.updateMainFrame(new MediaFile(file, type));
+                Main.updateMainFrame(new MediaFile(file, MediaHandler.getType(file)));
             }
         });
 

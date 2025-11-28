@@ -1,11 +1,10 @@
-package telemechan.dev;
+package telemechan.dev.media;
 
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
@@ -36,5 +35,21 @@ public class MediaHandler {
             default:
                 return new JLabel("Unsupported media");
         }
+    }
+
+    public static MediaType getType(File file){
+        String name = file.getName();
+        int dot = name.lastIndexOf('.');
+        String ext = (dot == -1) ? "" : name.substring(dot + 1);
+
+        MediaType type;
+        switch (ext.toLowerCase()) {
+            case  "jpg", "jpeg", "png" -> type = MediaType.IMAGE;
+            case  "gif" -> type = MediaType.GIF;
+            case  "mp4", "mov" -> type = MediaType.VIDEO;
+            default -> type = MediaType.UNKNOWN;
+        }
+
+        return type;
     }
 }
