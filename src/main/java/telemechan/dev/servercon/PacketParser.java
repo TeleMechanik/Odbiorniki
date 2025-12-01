@@ -3,6 +3,7 @@ package telemechan.dev.servercon;
 import telemechan.dev.servercon.annotations.PacketEventHandler;
 import telemechan.dev.servercon.packets.BasePacket;
 import telemechan.dev.servercon.packets.DebugPacket;
+import telemechan.dev.servercon.packets.SettingsPacket;
 import telemechan.dev.servercon.packets.UpdateRequestPacket;
 
 import java.lang.reflect.InvocationTargetException;
@@ -26,7 +27,7 @@ public class PacketParser {
         switch (rawPacket[0].toLowerCase()){
             case "debug" -> packet = new DebugPacket(rawPacket[0], rawPacket[1]);
             case "updaterequest" -> packet = new UpdateRequestPacket(rawPacket[0], rawPacket[1]);
-//            case "settings" -> packet = null;
+            case "settings" -> packet = new SettingsPacket(rawPacket[0], rawPacket[1]);
             default -> {
                 return;
             }

@@ -1,5 +1,7 @@
 package telemechan.dev;
 
+import telemechan.dev.settings.SettingsPanel;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 

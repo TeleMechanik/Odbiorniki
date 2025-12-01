@@ -1,8 +1,8 @@
-package telemechan.dev;
+package telemechan.dev.settings;
 
+import telemechan.dev.Main;
 import telemechan.dev.media.MediaFile;
 import telemechan.dev.media.MediaHandler;
-import telemechan.dev.media.MediaType;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;

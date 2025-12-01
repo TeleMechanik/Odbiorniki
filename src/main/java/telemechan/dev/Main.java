@@ -9,16 +9,20 @@ import lombok.Setter;
 import telemechan.dev.media.MediaFile;
 import telemechan.dev.media.MediaHandler;
 import telemechan.dev.media.MediaType;
-import telemechan.dev.servercon.Endpoint;
+import telemechan.dev.servercon.WebsocketReceiver;
 import telemechan.dev.servercon.PacketHandler;
 import telemechan.dev.servercon.PacketParser;
+import telemechan.dev.settings.ClientSettings;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Path;
+import java.util.Properties;
 
 
 public class Main {
@@ -37,7 +41,22 @@ public class Main {
     @Getter
     static PacketParser parser;
 
+    @Getter
+    static ClientSettings settings;
+
+    @Getter
+    static File dataFolder;
+
     public static void main(String[] args) {
+        dataFolder = getAppDataFolder();
+        File configFile = new File(dataFolder, "config.json");
+
+        if (!configFile.exists()) {
+            ClientSettings.saveDefault(configFile);
+        }
+
+        settings = new ClientSettings(configFile);
+
         try {
             // Example: Windows style
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
@@ -74,9 +93,9 @@ public class Main {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
         container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
-        String url = "ws://se01.creperus.top:10210/";
+        String url = "ws://"+ settings.getServerAddress() +"/";
         try {
-            session = container.connectToServer(Endpoint.class, URI.create(url));
+            session = container.connectToServer(WebsocketReceiver.class, URI.create(url));
         } catch (DeploymentException | IOException e) {
             throw new RuntimeException(e);
         }
@@ -109,5 +128,31 @@ public class Main {
         }
 
         mainFrame.requestFocusInWindow();
+    }
+
+    public static File getAppDataFolder() {
+        Properties props = new Properties();
+        try (InputStream in = Main.class.getResourceAsStream("/config.properties")) {
+            props.load(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        String appName = props.getProperty("app.name");
+
+        String os = System.getProperty("os.name").toLowerCase();
+        String path;
+
+        if (os.contains("win")) {
+            path = System.getenv("APPDATA");
+            if (path == null) path = System.getProperty("user.home") + "\\AppData\\Roaming";
+        } else { // Linux/Unix
+            path = System.getenv("XDG_DATA_HOME");
+            if (path == null) path = System.getProperty("user.home") + "/.local/share";
+        }
+
+        File folder = new File(path, appName);
+        if (!folder.exists()) folder.mkdirs();
+        return folder;
     }
 }
