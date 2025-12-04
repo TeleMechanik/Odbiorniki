@@ -30,12 +30,14 @@ public class ClientSettings {
     public String name;
 
     @NonNull
-    public String serverAddress;
+    public String serverAddress = "";
 
     /**
      * Map holding data required to display specific content at specific time
      */
     public HashMap<TimeRange, MediaFile> timedDisplay = new HashMap<>();
+
+    private File defaultDisplay;
 
     /**
      * Editable config file
@@ -80,13 +82,17 @@ public class ClientSettings {
      */
     private void reloadConfig(){
         ObjectMapper mapper = new ObjectMapper();
+
         JsonNode root = mapper.readTree(configFile);
 
         uuid = root.path("uuid").asString();
         name = root.path("name").asString();
         serverAddress = root.path("serverAddress").asString();
+        defaultDisplay = new File(root.path("defaultImgPath").asString());
 
         JsonNode timedDisplayNode = root.get("timedDisplay");
+
+        timedDisplay.clear();
 
         for(JsonNode entry : timedDisplayNode){
             LocalTime from = LocalTime.parse(entry.path("range").path("from").asString());
@@ -94,7 +100,7 @@ public class ClientSettings {
 
             TimeRange timeRange = new TimeRange(from, to);
 
-            String filePath = entry.path("media").path("file").asString();
+            String filePath = Main.getDataFolder().getPath() + "/upload/" + entry.path("media").path("file").asString();
             MediaFile mediaFile = new MediaFile(new File(filePath));
 
             timedDisplay.put(timeRange, mediaFile);
@@ -112,6 +118,7 @@ public class ClientSettings {
         root.put("uuid", ""); // default UUID
         root.put("name", ""); // default name
         root.put("serverAddress", ""); // default address
+        root.put("defaultImgPath", "");
 
         ArrayNode timedDisplayArray = root.putArray("timedDisplay");
 

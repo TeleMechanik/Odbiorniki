@@ -6,6 +6,7 @@ import jakarta.websocket.Session;
 import jakarta.websocket.WebSocketContainer;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.SneakyThrows;
 import telemechan.dev.media.MediaFile;
 import telemechan.dev.media.MediaHandler;
 import telemechan.dev.media.MediaType;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Path;
+import java.util.Objects;
 import java.util.Properties;
 
 
@@ -35,6 +37,9 @@ public class Main {
 
     @Getter @Setter
     static MediaHandler mediaHandler;
+
+    @Getter @Setter
+    static MediaFile currentFile;
 
     static int width, height;
     static JComponent currentComponent;
@@ -95,8 +100,8 @@ public class Main {
 
         if (!isLinux && d.isFullScreenSupported()) {
             mainFrame.setUndecorated(true);
-            mainFrame.setResizable(false);
-            d.setFullScreenWindow(mainFrame);
+            mainFrame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
+            mainFrame.setVisible(true);
         } else {
             // Linux-friendly fullscreen
             mainFrame.setUndecorated(true);
@@ -109,15 +114,7 @@ public class Main {
         parser = new PacketParser();
         parser.registerHandler(new PacketHandler());
 
-        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
-        container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
-        container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
-        String url = "ws://"+ settings.getServerAddress() +"/";
-        try {
-            session = container.connectToServer(WebsocketReceiver.class, URI.create(url));
-        } catch (DeploymentException | IOException e) {
-            throw new RuntimeException(e);
-        }
+        reconnectToServer();
     }
 
     public static void updateMainFrame(MediaFile mediaFile){
@@ -127,7 +124,7 @@ public class Main {
             }
             mainFrame.getContentPane().remove(currentComponent);
         }
-
+        currentFile = mediaFile;
         mediaHandler = new MediaHandler(mediaFile);
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
@@ -196,4 +193,19 @@ public class Main {
         return f;
     }
 
+    @SneakyThrows
+    public static void reconnectToServer(){
+        if(session != null && session.isOpen()) session.close();
+        session = null;
+
+        WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+        container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
+        container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
+        String url = "ws://"+ settings.getServerAddress() +"/";
+        try {
+            session = container.connectToServer(WebsocketReceiver.class, URI.create(url));
+        } catch (DeploymentException | IOException e) {
+            e.printStackTrace();
+        }
+    }
 }

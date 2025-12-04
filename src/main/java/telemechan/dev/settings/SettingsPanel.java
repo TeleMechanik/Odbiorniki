@@ -14,29 +14,30 @@ import java.util.Map;
 public class SettingsPanel extends JDialog {
     Map<String, String> settingsValues = new HashMap<>();
 
-
     public SettingsPanel() {
         setTitle("Ustawienia");
-        setSize(700, 400);
         setLocationRelativeTo(Main.getMainFrame());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
 
         setResizable(false);
 
-        FlowLayout layout = new FlowLayout();
-        layout.setAlignment(FlowLayout.LEFT);
-        layout.setHgap(5);
+        setLayout(new BoxLayout(getContentPane(), BoxLayout.Y_AXIS));
 
-        setLayout(layout);
+        ((JComponent) getContentPane()).setBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)
+        );
 
         add(getFileComponent());
         add(getServerAddressComponent());
-        add(cancelButton());
-        add(confirmButton());
+        add(getButtonsPanel());
+
+        pack();
+        setLocationRelativeTo(Main.getMainFrame());
     }
 
     private JPanel getFileComponent(){
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
         panel.add(new JLabel("Select file to be displayed: "));
 
         JButton button = new JButton("Select file");
@@ -54,14 +55,17 @@ public class SettingsPanel extends JDialog {
 
         panel.add(button);
 
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
+
         return panel;
     }
     private JPanel getServerAddressComponent(){
-        JPanel panel = new JPanel();
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
         panel.add(new JLabel("Server address: "));
 
         JTextField addressInput = new JTextField(Main.getSettings().getServerAddress(), 20);
+        settingsValues.put("serverAddress", Main.getSettings().getServerAddress());
         addressInput.setHorizontalAlignment(SwingConstants.RIGHT);
 
         addressInput.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
@@ -87,6 +91,16 @@ public class SettingsPanel extends JDialog {
 
         panel.add(addressInput);
 
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
+
+        return panel;
+    }
+
+    private JPanel getButtonsPanel() {
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        panel.add(cancelButton());
+        panel.add(confirmButton());
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
         return panel;
     }
 
@@ -100,6 +114,7 @@ public class SettingsPanel extends JDialog {
         JButton button = new JButton("Confirm");
         button.addActionListener(_ -> {
             Main.getSettings().saveData("serverAddress", settingsValues.get("serverAddress"));
+            Main.reconnectToServer();
             this.setVisible(false);
         });
         return button;
