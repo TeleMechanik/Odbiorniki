@@ -15,8 +15,12 @@ import telemechan.dev.servercon.PacketParser;
 import telemechan.dev.settings.ClientSettings;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,31 +63,46 @@ public class Main {
 
         try {
             // Example: Windows style
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+//            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 
-            // UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             // UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         mainFrame = new JFrame();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Point center = GraphicsEnvironment.getLocalGraphicsEnvironment().getCenterPoint();
+        mainFrame.setUndecorated(true);
 
+
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         width = (int) screenSize.getWidth();
         height = (int) screenSize.getHeight();
-        mainFrame.setBounds(center.x - width / 2, center.y - height / 2, width, height);
+        mainFrame.setSize(width, height);
+        mainFrame.setLocation(0, 0);
 
         mainFrame.setLayout(new BorderLayout());
 
-        mediaHandler = new MediaHandler(new MediaFile(new File("C:/Users/stasd/Downloads/1459929400_454.jpg"), MediaType.IMAGE));
+        mediaHandler = new MediaHandler(new MediaFile(generatePlaceholder(), MediaType.IMAGE));
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        mainFrame.setUndecorated(true);
-        mainFrame.setVisible(true);
+
+        GraphicsDevice d = GraphicsEnvironment
+                .getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        boolean isLinux = System.getProperty("os.name").toLowerCase().contains("linux");
+
+        if (!isLinux && d.isFullScreenSupported()) {
+            mainFrame.setUndecorated(true);
+            mainFrame.setResizable(false);
+            d.setFullScreenWindow(mainFrame);
+        } else {
+            // Linux-friendly fullscreen
+            mainFrame.setUndecorated(true);
+            mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            mainFrame.setVisible(true);
+        }
 
         KeyboardHandler.registerBinds();
 
@@ -155,4 +174,26 @@ public class Main {
         if (!folder.exists()) folder.mkdirs();
         return folder;
     }
+
+    private static File generatePlaceholder() {
+        int width = 200;
+        int height = 200;
+
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, width, height);
+        g.dispose();
+
+        File f = null;
+        try {
+            f = File.createTempFile("placeholder_", ".png");
+            ImageIO.write(img, "png", f);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return f;
+    }
+
 }

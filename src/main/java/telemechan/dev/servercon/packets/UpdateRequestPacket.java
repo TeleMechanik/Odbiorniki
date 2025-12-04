@@ -34,14 +34,15 @@ public class UpdateRequestPacket extends BasePacket{
             if (disposition != null && disposition.contains("filename=")) {
                 filename = disposition.split("filename=")[1].replace("\"", "");
             }
-
+            File path = new File(Main.getAppDataFolder() + "/upload/");
             try (InputStream in = conn.getInputStream()) {
-                Files.copy(in, Paths.get("C:/Pulpit/TeleMechanik/Testy atomowe/upload/" + filename), StandardCopyOption.REPLACE_EXISTING);
+                if(!path.exists()) path.mkdirs();
+                Files.copy(in, Paths.get( path + "/" + filename), StandardCopyOption.REPLACE_EXISTING);
             }
 
             System.out.println("✔ Saved file as: " + filename);
 
-            File file = new File("C:/Pulpit/TeleMechanik/Testy atomowe/upload/" + filename);
+            File file = new File(path + "/" + filename);
             Main.updateMainFrame(new MediaFile(file, MediaHandler.getType(file)));
         }catch (Exception e){
             System.out.println(e.getMessage());
