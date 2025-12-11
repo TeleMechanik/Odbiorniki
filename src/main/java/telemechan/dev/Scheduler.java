@@ -47,7 +47,7 @@ public class Scheduler {
             }
 
             try {
-                Main.getSession().getBasicRemote().sendText("updaterequest:::placeholder");
+                Main.getSession().getBasicRemote().sendText("updaterequest:::" + Main.getSettings().getUuid());
             } catch (IOException e) {
                 e.printStackTrace();
             }

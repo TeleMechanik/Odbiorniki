@@ -13,7 +13,7 @@ public class WebsocketReceiver {
         System.out.println("Connected!");
         try {
             session.getBasicRemote().sendText("UUID:::" + Optional.ofNullable(Main.getSettings().getUuid()).orElse("NaN"));
-            session.getBasicRemote().sendText("updaterequest:::" + Main.getSettings().getUuid());
+            session.getBasicRemote().sendText("updaterequest:::" + Optional.ofNullable(Main.getSettings().getUuid()).orElse("NaN"));
 
         } catch (IOException e) {
             throw new RuntimeException(e);
