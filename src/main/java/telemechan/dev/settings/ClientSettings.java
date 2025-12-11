@@ -23,12 +23,6 @@ public class ClientSettings {
     @Nullable
     public String uuid;
 
-    /**
-     * Display name of the receiver
-     */
-    @Nullable
-    public String name;
-
     @NonNull
     public String serverAddress = "";
 
@@ -86,7 +80,6 @@ public class ClientSettings {
         JsonNode root = mapper.readTree(configFile);
 
         uuid = root.path("uuid").asString();
-        name = root.path("name").asString();
         serverAddress = root.path("serverAddress").asString();
         defaultDisplay = new File(root.path("defaultImgPath").asString());
 
