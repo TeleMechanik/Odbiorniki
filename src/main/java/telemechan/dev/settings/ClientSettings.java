@@ -91,10 +91,11 @@ public class ClientSettings {
         defaultDisplay = new File(root.path("defaultImgPath").asString());
 
         JsonNode timedDisplayNode = root.get("timedDisplay");
+        JsonNode timedArrayNode = mapper.readTree(timedDisplayNode.asString());
 
         timedDisplay.clear();
 
-        for(JsonNode entry : timedDisplayNode){
+        for(JsonNode entry : timedArrayNode){
             LocalTime from = LocalTime.parse(entry.path("range").path("from").asString());
             LocalTime to = LocalTime.parse(entry.path("range").path("to").asString());
 

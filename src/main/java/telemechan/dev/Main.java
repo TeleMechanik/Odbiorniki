@@ -19,15 +19,11 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Path;
-import java.util.Objects;
 import java.util.Properties;
 
 
@@ -55,6 +51,8 @@ public class Main {
 
     @Getter
     static File dataFolder;
+
+    static Scheduler scheduler;
 
     public static void main(String[] args) {
         dataFolder = getAppDataFolder();
@@ -115,6 +113,18 @@ public class Main {
         parser.registerHandler(new PacketHandler());
 
         reconnectToServer();
+
+        scheduler = new Scheduler();
+        scheduler.startSchedules();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            scheduler.stopScheduler();
+            try {
+                session.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }));
     }
 
     public static void updateMainFrame(MediaFile mediaFile){
@@ -172,7 +182,7 @@ public class Main {
         return folder;
     }
 
-    private static File generatePlaceholder() {
+    public static File generatePlaceholder() {
         int width = 200;
         int height = 200;
 

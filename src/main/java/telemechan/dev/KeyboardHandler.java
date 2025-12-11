@@ -4,6 +4,8 @@ import telemechan.dev.settings.SettingsPanel;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 public class KeyboardHandler{
 
@@ -26,6 +28,11 @@ public class KeyboardHandler{
                 settingsPanel.setVisible(true);
             }
         });
+
+        im.put(KeyStroke.getKeyStroke(
+                KeyEvent.VK_R,
+                InputEvent.CTRL_DOWN_MASK
+        ), "");
 
     }
 }
