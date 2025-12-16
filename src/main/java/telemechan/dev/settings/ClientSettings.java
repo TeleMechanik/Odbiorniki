@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import telemechan.dev.Main;
 import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaHandler;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ArrayNode;
@@ -12,7 +13,10 @@ import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 @Getter
@@ -29,7 +33,7 @@ public class ClientSettings {
     /**
      * Map holding data required to display specific content at specific time
      */
-    public HashMap<TimeRange, MediaFile> timedDisplay = new HashMap<>();
+    public HashMap<TimeRange, String> timedDisplay = new HashMap<>();
 
     private File defaultDisplay;
 
@@ -87,17 +91,23 @@ public class ClientSettings {
         JsonNode timedArrayNode = mapper.readTree(timedDisplayNode.asString());
 
         timedDisplay.clear();
+        MediaHandler.preloadedMedia.clear();
 
         for(JsonNode entry : timedArrayNode){
-            LocalTime from = LocalTime.parse(entry.path("range").path("from").asString());
-            LocalTime to = LocalTime.parse(entry.path("range").path("to").asString());
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+            LocalDateTime from = LocalDateTime.parse(entry.path("range").path("from").asString(), formatter);
+            LocalDateTime to = LocalDateTime.parse(entry.path("range").path("to").asString(), formatter);
 
             TimeRange timeRange = new TimeRange(from, to);
 
-            String filePath = Main.getDataFolder().getPath() + "/upload/" + entry.path("media").path("file").asString();
+            String fileName =  entry.path("media").path("file").asString();
+            String filePath = Main.getDataFolder().getPath() + "/upload/" + fileName;
             MediaFile mediaFile = new MediaFile(new File(filePath));
 
-            timedDisplay.put(timeRange, mediaFile);
+            MediaHandler.preloadedMedia.put(fileName, mediaFile);
+
+            timedDisplay.put(timeRange, fileName);
         }
     }
 

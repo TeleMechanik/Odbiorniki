@@ -7,9 +7,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class MediaHandler {
     private final MediaFile mediaFile;
+
+    public static HashMap<String, MediaFile> preloadedMedia = new HashMap<>();
 
     public MediaHandler(MediaFile file){
         this.mediaFile = file;

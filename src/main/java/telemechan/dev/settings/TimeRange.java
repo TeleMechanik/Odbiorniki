@@ -3,18 +3,20 @@ package telemechan.dev.settings;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Setter
 @Getter
 public class TimeRange {
-    private LocalTime from;
+    private LocalDateTime from;
 
-    private LocalTime to;
+    private LocalDateTime to;
 
     public TimeRange(){}
 
-    public TimeRange(LocalTime from, LocalTime to){
+    public TimeRange(LocalDateTime from, LocalDateTime to){
         this.from = from;
         this.to = to;
     }
@@ -22,7 +24,7 @@ public class TimeRange {
     /**
      * @return true if the time is inside the time range
      */
-    public boolean isWithinRange(LocalTime time) {
+    public boolean isWithinRange(LocalDateTime time) {
         return !time.isBefore(from) && !time.isAfter(to);
     }
 

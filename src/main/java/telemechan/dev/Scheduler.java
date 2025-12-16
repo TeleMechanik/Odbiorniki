@@ -1,10 +1,11 @@
 package telemechan.dev;
 
 import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaHandler;
 import telemechan.dev.settings.TimeRange;
 
 import java.io.IOException;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -14,10 +15,10 @@ public class Scheduler {
 
     public void startSchedules(){
         scheduler.scheduleAtFixedRate(() -> {
-            LocalTime time = LocalTime.now();
+            LocalDateTime time = LocalDateTime.now();
 
             for (TimeRange timeRange : Main.getSettings().getTimedDisplay().keySet()){
-                MediaFile file = Main.getSettings().getTimedDisplay().get(timeRange);
+                MediaFile file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
                 if(timeRange.isWithinRange(time) && Main.getCurrentFile() != file){
                     Main.updateMainFrame(file);
                     return;
