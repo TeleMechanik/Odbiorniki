@@ -1,21 +1,15 @@
 package telemechan.dev.settings;
 
-import jakarta.annotation.Nullable;
 import lombok.Getter;
-import lombok.NonNull;
 import telemechan.dev.Main;
 import telemechan.dev.media.MediaFile;
 import telemechan.dev.media.MediaHandler;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.io.File;
-import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
@@ -24,10 +18,17 @@ public class ClientSettings {
     /**
      * UUID of the receiver
      */
-    @Nullable
     public String uuid;
 
-    @NonNull
+    /**
+     * Owner token required for the first connection to the server
+     */
+    public String token;
+
+
+    /**
+     * Address of the main server to connect to
+     */
     public String serverAddress = "";
 
     /**
@@ -35,6 +36,9 @@ public class ClientSettings {
      */
     public HashMap<TimeRange, String> timedDisplay = new HashMap<>();
 
+    /**
+     * Default file that's displayed if nothing is present in the schedule for that time
+     */
     private File defaultDisplay;
 
     /**
@@ -56,8 +60,9 @@ public class ClientSettings {
      * This method saves data provided to the config file
      * @param key under what key should the value be saved
      * @param value what value should be saved
+     * @return returns ClientSettings instance
      */
-    public void saveData(String key, String value) {
+    public ClientSettings saveData(String key, String value) {
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root;
 
@@ -71,19 +76,20 @@ public class ClientSettings {
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, root);
 
-        reloadConfig();
+        return this;
     }
 
 
     /**
      * Reloads the settings updating the current variables with loaded ones
      */
-    private void reloadConfig(){
+    public void reloadConfig(){
         ObjectMapper mapper = new ObjectMapper();
 
         JsonNode root = mapper.readTree(configFile);
 
         uuid = root.path("uuid").asString();
+        token = root.path("token").asString();
         serverAddress = root.path("serverAddress").asString();
         defaultDisplay = new File(root.path("defaultImgPath").asString());
 
@@ -120,11 +126,10 @@ public class ClientSettings {
         ObjectNode root = mapper.createObjectNode();
 
         root.put("uuid", ""); // default UUID
-        root.put("name", ""); // default name
+        root.put("token", ""); // default Token
         root.put("serverAddress", ""); // default address
         root.put("defaultImgPath", "");
-
-        ArrayNode timedDisplayArray = root.putArray("timedDisplay");
+        root.putArray("timedDisplay");
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, root);
     }

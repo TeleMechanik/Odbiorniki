@@ -29,6 +29,7 @@ public class SettingsPanel extends JDialog {
 
         add(getFileComponent());
         add(getServerAddressComponent());
+        add(getTokenComponent());
         add(getButtonsPanel());
 
         pack();
@@ -96,6 +97,43 @@ public class SettingsPanel extends JDialog {
         return panel;
     }
 
+    private JPanel getTokenComponent(){
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        panel.add(new JLabel("Owner Token: "));
+
+        JTextField tokenInput = new JTextField(Main.getSettings().getToken(), 20);
+        settingsValues.put("token", Main.getSettings().getToken());
+        tokenInput.setHorizontalAlignment(SwingConstants.RIGHT);
+
+        tokenInput.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
+            @Override
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                updateAddress();
+            }
+
+            @Override
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                updateAddress();
+            }
+
+            @Override
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                updateAddress();
+            }
+
+            private void updateAddress() {
+                settingsValues.put("token", tokenInput.getText());
+            }
+        });
+
+        panel.add(tokenInput);
+
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
+
+        return panel;
+    }
+
     private JPanel getButtonsPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panel.add(cancelButton());
@@ -113,7 +151,11 @@ public class SettingsPanel extends JDialog {
     private JButton confirmButton(){
         JButton button = new JButton("Confirm");
         button.addActionListener(_ -> {
-            Main.getSettings().saveData("serverAddress", settingsValues.get("serverAddress"));
+            Main.getSettings()
+                    .saveData("serverAddress", settingsValues.get("serverAddress"))
+                    .saveData("token", settingsValues.get("token"))
+                    .reloadConfig();
+
             Main.reconnectToServer();
             this.setVisible(false);
         });

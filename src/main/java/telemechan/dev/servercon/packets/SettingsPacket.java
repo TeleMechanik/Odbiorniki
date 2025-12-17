@@ -27,7 +27,9 @@ public class SettingsPacket extends BasePacket {
                 stringValue = mapper.writeValueAsString(val);
             }
 
-            Main.getSettings().saveData(entry.getKey(), stringValue);
+            Main.getSettings()
+                    .saveData(entry.getKey(), stringValue)
+                    .reloadConfig();
         }
 
     }

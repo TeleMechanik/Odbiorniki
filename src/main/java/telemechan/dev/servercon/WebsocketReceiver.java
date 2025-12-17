@@ -4,7 +4,6 @@ import jakarta.websocket.*;
 import telemechan.dev.Main;
 
 import java.io.IOException;
-import java.util.Optional;
 
 @ClientEndpoint
 public class WebsocketReceiver {
@@ -12,8 +11,12 @@ public class WebsocketReceiver {
     public void onOpen(Session session) {
         System.out.println("Connected!");
         try {
-            session.getBasicRemote().sendText("UUID:::" + Optional.ofNullable(Main.getSettings().getUuid()).orElse("NaN"));
-            session.getBasicRemote().sendText("updaterequest:::" + Optional.ofNullable(Main.getSettings().getUuid()).orElse("NaN"));
+            if(!Main.getSettings().getUuid().isBlank()) {
+                session.getBasicRemote().sendText("UUID:::" + Main.getSettings().getUuid());
+                session.getBasicRemote().sendText("updaterequest:::" + Main.getSettings().getUuid());
+            }else{
+                session.getBasicRemote().sendText("token:::" + Main.getSettings().getToken());
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);

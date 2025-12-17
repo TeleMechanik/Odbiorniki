@@ -208,6 +208,8 @@ public class Main {
         if(session != null && session.isOpen()) session.close();
         session = null;
 
+        if(settings.getUuid().isBlank() && settings.getToken().isBlank())return;
+
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
         container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
