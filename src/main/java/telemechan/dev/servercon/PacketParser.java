@@ -14,7 +14,6 @@ import java.util.List;
 public class PacketParser {
     private final List<PacketListener> listeners = new ArrayList<>();
 
-
     public void registerHandler(PacketListener listener){
         listeners.add(listener);
     }
