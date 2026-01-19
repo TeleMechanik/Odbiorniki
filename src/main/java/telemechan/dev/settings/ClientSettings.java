@@ -2,7 +2,7 @@ package telemechan.dev.settings;
 
 import lombok.Getter;
 import telemechan.dev.Main;
-import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaContainer;
 import telemechan.dev.media.MediaHandler;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
@@ -109,9 +109,12 @@ public class ClientSettings {
 
             String fileName =  entry.path("media").path("file").asString();
             String filePath = Main.getDataFolder().getPath() + "/upload/" + fileName;
-            MediaFile mediaFile = new MediaFile(new File(filePath));
 
-            MediaHandler.preloadedMedia.put(fileName, mediaFile);
+            int priority = entry.path("priority").asInt();
+
+            MediaContainer mediaContainer = new MediaContainer(new File(filePath), priority);
+
+            MediaHandler.preloadedMedia.put(fileName, mediaContainer);
 
             timedDisplay.put(timeRange, fileName);
         }
@@ -129,7 +132,7 @@ public class ClientSettings {
         root.put("token", ""); // default Token
         root.put("serverAddress", ""); // default address
         root.put("defaultImgPath", "");
-        root.putArray("timedDisplay");
+        root.put("timedDisplay", "");
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(configFile, root);
     }

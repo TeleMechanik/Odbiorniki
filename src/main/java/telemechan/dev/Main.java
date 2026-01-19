@@ -7,7 +7,7 @@ import jakarta.websocket.WebSocketContainer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaContainer;
 import telemechan.dev.media.MediaHandler;
 import telemechan.dev.media.MediaType;
 import telemechan.dev.servercon.WebsocketReceiver;
@@ -35,7 +35,7 @@ public class Main {
     static MediaHandler mediaHandler;
 
     @Getter @Setter
-    static MediaFile currentFile;
+    static MediaContainer currentFile;
 
     static int width, height;
     static JComponent currentComponent;
@@ -86,7 +86,7 @@ public class Main {
 
         mainFrame.setLayout(new BorderLayout());
 
-        mediaHandler = new MediaHandler(new MediaFile(generatePlaceholder(), MediaType.IMAGE));
+        mediaHandler = new MediaHandler(new MediaContainer(generatePlaceholder(), MediaType.IMAGE, -1));
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
@@ -127,15 +127,15 @@ public class Main {
         }));
     }
 
-    public static void updateMainFrame(MediaFile mediaFile){
+    public static void updateMainFrame(MediaContainer mediaContainer){
         if (currentComponent != null) {
             if(currentComponent instanceof EmbeddedMediaPlayerComponent component){
                 component.mediaPlayer().controls().stop();
             }
             mainFrame.getContentPane().remove(currentComponent);
         }
-        currentFile = mediaFile;
-        mediaHandler = new MediaHandler(mediaFile);
+        currentFile = mediaContainer;
+        mediaHandler = new MediaHandler(mediaContainer);
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
@@ -144,7 +144,7 @@ public class Main {
 
         if(currentComponent instanceof EmbeddedMediaPlayerComponent component){
             component.mediaPlayer().media().play(
-                    mediaFile.getFile().getAbsolutePath(),
+                    mediaContainer.getFile().getAbsolutePath(),
                     ":input-repeat=65535",
                     ":no-audio"
             );

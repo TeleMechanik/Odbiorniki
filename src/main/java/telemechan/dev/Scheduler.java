@@ -1,11 +1,13 @@
 package telemechan.dev;
 
-import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaContainer;
 import telemechan.dev.media.MediaHandler;
 import telemechan.dev.settings.TimeRange;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -17,17 +19,30 @@ public class Scheduler {
         scheduler.scheduleAtFixedRate(() -> {
             LocalDateTime time = LocalDateTime.now();
 
+            List<MediaContainer> filesInTimeRange = new ArrayList<>();
+
             for (TimeRange timeRange : Main.getSettings().getTimedDisplay().keySet()){
-                MediaFile file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
-                if(timeRange.isWithinRange(time) && Main.getCurrentFile() != file){
-                    Main.updateMainFrame(file);
-                    return;
-                }else if(timeRange.isWithinRange(time) && Main.getCurrentFile() == file){
-                    return;
+                MediaContainer file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
+
+                if(timeRange.isWithinRange(time)){
+                    filesInTimeRange.add(file);
                 }
             }
 
-            Main.updateMainFrame(new MediaFile(Main.generatePlaceholder()));
+            filesInTimeRange.sort(null);
+
+            if (filesInTimeRange.isEmpty()) {
+                Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
+                return;
+            }
+
+            MediaContainer highest = filesInTimeRange.getFirst();
+
+            if (highest == Main.getCurrentFile()) {
+                return;
+            }
+
+            Main.updateMainFrame(highest);
         }, 0, 1, TimeUnit.SECONDS);
 
         scheduler.scheduleAtFixedRate(() -> {
@@ -54,7 +69,7 @@ public class Scheduler {
             }
 
             System.out.println("Updated successfully!");
-        }, 5, 1, TimeUnit.MINUTES);
+        }, 1, 1, TimeUnit.MINUTES);
     }
 
     public void stopScheduler(){

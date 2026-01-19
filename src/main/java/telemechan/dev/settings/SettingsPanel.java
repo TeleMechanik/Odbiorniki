@@ -1,7 +1,7 @@
 package telemechan.dev.settings;
 
 import telemechan.dev.Main;
-import telemechan.dev.media.MediaFile;
+import telemechan.dev.media.MediaContainer;
 import telemechan.dev.media.MediaHandler;
 
 import javax.swing.*;
@@ -50,7 +50,7 @@ public class SettingsPanel extends JDialog {
             if(r == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
 
-                Main.updateMainFrame(new MediaFile(file, MediaHandler.getType(file)));
+                Main.updateMainFrame(new MediaContainer(file, MediaHandler.getType(file), -1));
             }
         });
 

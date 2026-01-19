@@ -10,24 +10,24 @@ import java.io.IOException;
 import java.util.HashMap;
 
 public class MediaHandler {
-    private final MediaFile mediaFile;
+    private final MediaContainer mediaContainer;
 
-    public static HashMap<String, MediaFile> preloadedMedia = new HashMap<>();
+    public static HashMap<String, MediaContainer> preloadedMedia = new HashMap<>();
 
-    public MediaHandler(MediaFile file){
-        this.mediaFile = file;
+    public MediaHandler(MediaContainer file){
+        this.mediaContainer = file;
     }
 
     public JComponent getMediaComponent(int width, int height) {
-        switch (mediaFile.getType()) {
+        switch (mediaContainer.getType()) {
             case IMAGE:
                 try {
-                    return new JLabel(new ImageIcon(ImageIO.read(new File(mediaFile.getFile().getAbsolutePath())).getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+                    return new JLabel(new ImageIcon(ImageIO.read(new File(mediaContainer.getFile().getAbsolutePath())).getScaledInstance(width, height, Image.SCALE_SMOOTH)));
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             case GIF:
-                ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(mediaFile.getFile().getAbsolutePath()).getScaledInstance(width, height, Image.SCALE_DEFAULT));
+                ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(mediaContainer.getFile().getAbsolutePath()).getScaledInstance(width, height, Image.SCALE_DEFAULT));
 
                 return new JLabel(icon);
             case VIDEO:

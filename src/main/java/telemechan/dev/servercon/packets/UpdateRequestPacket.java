@@ -1,8 +1,6 @@
 package telemechan.dev.servercon.packets;
 
 import telemechan.dev.Main;
-import telemechan.dev.media.MediaFile;
-import telemechan.dev.media.MediaHandler;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -47,7 +45,7 @@ public class UpdateRequestPacket extends BasePacket{
                     String filePath = path + File.separator + entry.getName();
                     if (!entry.isDirectory()) {
                         try (BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
-                            byte[] buffer = new byte[4096];
+                            byte[] buffer = new byte[8192];
                             int read;
                             while ((read = zipIn.read(buffer)) != -1) {
                                 bos.write(buffer, 0, read);
