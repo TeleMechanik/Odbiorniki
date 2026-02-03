@@ -30,6 +30,7 @@ public class SettingsPanel extends JDialog {
         add(getFileComponent());
         add(getServerAddressComponent());
         add(getTokenComponent());
+        add(getDefaultDisplayPanel());
         add(getButtonsPanel());
 
         pack();
@@ -128,6 +129,34 @@ public class SettingsPanel extends JDialog {
         });
 
         panel.add(tokenInput);
+
+        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
+
+        return panel;
+    }
+
+    private JPanel getDefaultDisplayPanel(){
+        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+
+        panel.add(new JLabel("Select default file to be displayed: "));
+
+        JButton button = new JButton("Select file");
+
+        button.addActionListener(_ -> {
+            JFileChooser fileChooser = getFileChooser();
+
+            int r = fileChooser.showOpenDialog(null);
+            if(r == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+
+                try {
+                    Main.getSettings().saveData("defaultImgPath", file.getCanonicalPath());
+                    Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
+                }catch (Exception _){}
+            }
+        });
+
+        panel.add(button);
 
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
 

@@ -9,6 +9,9 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -61,6 +64,12 @@ public class UpdateRequestPacket extends BasePacket{
             File file = new File(path + "/" + filename);
             file.delete();
 
+            Set<String> neededFiles = new HashSet<>(Main.getSettings().getTimedDisplay().values());
+            for(File testedFile : Objects.requireNonNull(new File(path + "/").listFiles())){
+                if (!neededFiles.contains(testedFile.getName())) {
+                    testedFile.delete();
+                }
+            }
         }catch (Exception e){
             System.out.println(e.getMessage());
         }

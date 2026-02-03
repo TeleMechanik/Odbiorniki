@@ -5,6 +5,7 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,14 +23,51 @@ public class MediaHandler {
         switch (mediaContainer.getType()) {
             case IMAGE:
                 try {
-                    return new JLabel(new ImageIcon(ImageIO.read(new File(mediaContainer.getFile().getAbsolutePath())).getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+                    BufferedImage image = ImageIO.read(mediaContainer.getFile());
+
+                    float scale = Math.min(
+                            (float) width / image.getWidth(),
+                            (float) height / image.getHeight()
+                    );
+
+                    int newW = Math.round(image.getWidth() * scale);
+                    int newH = Math.round(image.getHeight() * scale);
+
+                    Image scaled = image.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+
+                    JLabel label = new JLabel(new ImageIcon(scaled));
+                    label.setHorizontalAlignment(JLabel.CENTER);
+                    label.setVerticalAlignment(JLabel.CENTER);
+
+                    return label;
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
             case GIF:
-                ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit().getImage(mediaContainer.getFile().getAbsolutePath()).getScaledInstance(width, height, Image.SCALE_DEFAULT));
+                Image img = Toolkit.getDefaultToolkit()
+                        .getImage(mediaContainer.getFile().getAbsolutePath());
 
-                return new JLabel(icon);
+                ImageIcon base = new ImageIcon(img);
+
+                int imgW = base.getIconWidth();
+                int imgH = base.getIconHeight();
+
+                float scale = Math.min(
+                        (float) width / imgW,
+                        (float) height / imgH
+                );
+
+                int newW = Math.round(imgW * scale);
+                int newH = Math.round(imgH * scale);
+
+                Image scaled = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
+
+                JLabel label = new JLabel(new ImageIcon(scaled));
+                label.setHorizontalAlignment(JLabel.CENTER);
+                label.setVerticalAlignment(JLabel.CENTER);
+
+                return label;
+
             case VIDEO:
                 EmbeddedMediaPlayerComponent mediaPlayerComponent = new EmbeddedMediaPlayerComponent();
                 mediaPlayerComponent.setPreferredSize(new Dimension(width, height));

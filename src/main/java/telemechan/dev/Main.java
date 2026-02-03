@@ -19,6 +19,8 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +67,6 @@ public class Main {
         settings = new ClientSettings(configFile);
 
         try {
-            // Example: Windows style
 //            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
 
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -85,12 +86,31 @@ public class Main {
         mainFrame.setLocation(0, 0);
 
         mainFrame.setLayout(new BorderLayout());
+        mainFrame.getContentPane().setBackground(Color.BLACK);
 
         mediaHandler = new MediaHandler(new MediaContainer(generatePlaceholder(), MediaType.IMAGE, -1));
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        BufferedImage image = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
+        Cursor invisibleCursor = toolkit.createCustomCursor(image, new Point(0, 0), "invisible");
+
+        mainFrame.addWindowFocusListener(new WindowAdapter() {
+            @Override
+            public void windowGainedFocus(WindowEvent e){
+                super.windowGainedFocus(e);
+
+                mainFrame.setCursor(invisibleCursor);
+            }
+            @Override
+            public void windowLostFocus(WindowEvent e) {
+                super.windowLostFocus(e);
+                mainFrame.setCursor(Cursor.getDefaultCursor());
+            }
+        });
 
         GraphicsDevice d = GraphicsEnvironment
                 .getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -101,7 +121,6 @@ public class Main {
             mainFrame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
             mainFrame.setVisible(true);
         } else {
-            // Linux-friendly fullscreen
             mainFrame.setUndecorated(true);
             mainFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
             mainFrame.setVisible(true);
@@ -137,6 +156,7 @@ public class Main {
         currentFile = mediaContainer;
         mediaHandler = new MediaHandler(mediaContainer);
         currentComponent = mediaHandler.getMediaComponent(width, height);
+
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
         mainFrame.revalidate();
@@ -183,21 +203,25 @@ public class Main {
     }
 
     public static File generatePlaceholder() {
-        int width = 200;
-        int height = 200;
+        int width = mainFrame.getWidth();
+        int height = mainFrame.getHeight();
 
-        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g = img.createGraphics();
-        g.setColor(Color.BLACK);
-        g.fillRect(0, 0, width, height);
-        g.dispose();
+        File f;
+        if(settings.getDefaultDisplay() != null && settings.getDefaultDisplay().exists()){
+            f = settings.getDefaultDisplay();
+        }else {
+            BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = img.createGraphics();
+            g.setColor(Color.BLACK);
+            g.fillRect(0, 0, width, height);
+            g.dispose();
 
-        File f = null;
-        try {
-            f = File.createTempFile("placeholder_", ".png");
-            ImageIO.write(img, "png", f);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            try {
+                f = File.createTempFile("placeholder_", ".png");
+                ImageIO.write(img, "png", f);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         return f;
