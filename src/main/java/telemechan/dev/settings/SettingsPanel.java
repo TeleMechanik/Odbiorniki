@@ -27,7 +27,7 @@ public class SettingsPanel extends JDialog {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)
         );
 
-        add(getFileComponent());
+//        add(getFileComponent());
         add(getServerAddressComponent());
         add(getTokenComponent());
         add(getDefaultDisplayPanel());
@@ -37,30 +37,31 @@ public class SettingsPanel extends JDialog {
         setLocationRelativeTo(Main.getMainFrame());
     }
 
-    private JPanel getFileComponent(){
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//    private JPanel getFileComponent(){
+//        JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+//
+//        panel.add(new JLabel("Select file to be displayed: "));
+//
+//        JButton button = new JButton("Select file");
+//
+//        button.addActionListener(_ -> {
+//            JFileChooser fileChooser = getFileChooser();
+//
+//            int r = fileChooser.showOpenDialog(null);
+//            if(r == JFileChooser.APPROVE_OPTION) {
+//                File file = fileChooser.getSelectedFile();
+//
+//                Main.updateMainFrame(new MediaContainer(file, MediaHandler.getType(file), -1));
+//            }
+//        });
+//
+//        panel.add(button);
+//
+//        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
+//
+//        return panel;
+//    }
 
-        panel.add(new JLabel("Select file to be displayed: "));
-
-        JButton button = new JButton("Select file");
-
-        button.addActionListener(_ -> {
-            JFileChooser fileChooser = getFileChooser();
-
-            int r = fileChooser.showOpenDialog(null);
-            if(r == JFileChooser.APPROVE_OPTION) {
-                File file = fileChooser.getSelectedFile();
-
-                Main.updateMainFrame(new MediaContainer(file, MediaHandler.getType(file), -1));
-            }
-        });
-
-        panel.add(button);
-
-        panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, (int) panel.getPreferredSize().getHeight()));
-
-        return panel;
-    }
     private JPanel getServerAddressComponent(){
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
