@@ -26,8 +26,8 @@ public class Scheduler {
             List<MediaContainer> filesInTimeRange = new ArrayList<>();
 
             for (TimeRange timeRange : Main.getSettings().getTimedDisplay().keySet()){
-                MediaContainer file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
                 if(timeRange.isWithinRange(time)){
+                    MediaContainer file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
                     filesInTimeRange.add(file);
                 }
             }
