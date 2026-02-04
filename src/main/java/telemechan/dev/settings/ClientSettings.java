@@ -91,7 +91,8 @@ public class ClientSettings {
         uuid = root.path("uuid").asString();
         token = root.path("token").asString();
         serverAddress = root.path("serverAddress").asString();
-        defaultDisplay = new File(root.path("defaultImgPath").asString());
+        String filename = root.path("defaultImgPath").asString();
+        defaultDisplay = filename != null && !filename.isBlank() ? new File(filename) : null;
 
         JsonNode timedDisplayNode = root.get("timedDisplay");
         JsonNode timedArrayNode = mapper.readTree(timedDisplayNode.asString());

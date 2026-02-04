@@ -151,6 +151,7 @@ public class SettingsPanel extends JDialog {
 
                 try {
                     Main.getSettings().saveData("defaultImgPath", file.getCanonicalPath());
+                    Main.getSettings().reloadConfig();
                     Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
                 }catch (Exception _){}
             }
