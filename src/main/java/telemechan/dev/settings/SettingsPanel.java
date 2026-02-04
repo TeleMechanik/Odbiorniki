@@ -15,7 +15,7 @@ public class SettingsPanel extends JDialog {
     Map<String, String> settingsValues = new HashMap<>();
 
     public SettingsPanel() {
-        setTitle("Ustawienia");
+        setTitle("Settings");
         setLocationRelativeTo(Main.getMainFrame());
         setDefaultCloseOperation(HIDE_ON_CLOSE);
 
