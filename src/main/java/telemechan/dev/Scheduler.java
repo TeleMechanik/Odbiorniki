@@ -25,8 +25,8 @@ public class Scheduler {
 
             List<MediaContainer> filesInTimeRange = new ArrayList<>();
 
-            for (TimeRange timeRange : Main.getSettings().getTimedDisplay().keySet()){
-                if(timeRange.isWithinRange(time)){
+            for (TimeRange timeRange : Main.getSettings().getTimedDisplay().keySet()) {
+                if (timeRange.isWithinRange(time)) {
                     MediaContainer file = MediaHandler.preloadedMedia.get(Main.getSettings().getTimedDisplay().get(timeRange));
                     filesInTimeRange.add(file);
                 }
@@ -34,10 +34,15 @@ public class Scheduler {
 
             filesInTimeRange.sort(null);
 
+
             if (filesInTimeRange.isEmpty()) {
                 Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
                 return;
             }
+
+            filesInTimeRange.forEach(file -> {
+                System.out.printf("Name: %s Priority: %d\n", file.getFile().getName(), file.getPriority());
+            });
 
             MediaContainer highest = filesInTimeRange.getFirst();
 
