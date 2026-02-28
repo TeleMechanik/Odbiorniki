@@ -40,10 +40,6 @@ public class Scheduler {
                 return;
             }
 
-            filesInTimeRange.forEach(file -> {
-                System.out.printf("Name: %s Priority: %d\n", file.getFile().getName(), file.getPriority());
-            });
-
             MediaContainer highest = filesInTimeRange.getFirst();
 
             if(highest.getPriority() > 0) {

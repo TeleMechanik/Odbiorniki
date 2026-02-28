@@ -237,7 +237,14 @@ public class Main {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
         container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
-        String url = "ws://"+ settings.getServerAddress() +"/";
+
+        String url;
+        if(settings.getServerAddress().contains("https://")) {
+            url = "wss://" + settings.getServerAddress() + "/";
+        }else {
+            url = "ws://" + settings.getServerAddress() + "/";
+        }
+
         try {
             session = container.connectToServer(WebsocketReceiver.class, URI.create(url));
         } catch (DeploymentException | IOException e) {
