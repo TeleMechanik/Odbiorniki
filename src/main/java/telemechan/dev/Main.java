@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 
@@ -177,28 +178,31 @@ public class Main {
     }
 
     public static File getAppDataFolder() {
-        Properties props = new Properties();
-        try (InputStream in = Main.class.getResourceAsStream("/config.properties")) {
-            props.load(in);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        String appName = props.getProperty("app.name");
+        String appName = "TeleMechanikOdbiorniki";
 
         String os = System.getProperty("os.name").toLowerCase();
         String path;
 
         if (os.contains("win")) {
+            // Windows: Check APPDATA, fallback to user.home/AppData/Roaming
             path = System.getenv("APPDATA");
-            if (path == null) path = System.getProperty("user.home") + "\\AppData\\Roaming";
-        } else { // Linux/Unix
+            if (path == null) {
+                path = Paths.get(System.getProperty("user.home"), "AppData", "Roaming").toString();
+            }
+        } else {
+            // Linux/Unix: Check XDG_DATA_HOME, fallback to ~/.local/share
             path = System.getenv("XDG_DATA_HOME");
-            if (path == null) path = System.getProperty("user.home") + "/.local/share";
+            if (path == null || path.isEmpty()) {
+                path = Paths.get(System.getProperty("user.home"), ".local", "share").toString();
+            }
         }
 
         File folder = new File(path, appName);
-        if (!folder.exists()) folder.mkdirs();
+        if (!folder.exists()) {
+            boolean created = folder.mkdirs();
+            if (created) System.out.println("Created directory: " + folder.getAbsolutePath());
+        }
+
         return folder;
     }
 
