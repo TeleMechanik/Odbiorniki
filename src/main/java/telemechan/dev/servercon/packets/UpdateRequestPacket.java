@@ -25,7 +25,8 @@ public class UpdateRequestPacket extends BasePacket{
         try {
             System.out.println("Trying to download the file needed...");
 
-            URL url = URI.create("http://se01.creperus.top:10210/upload?uuid=" + Main.getSettings().getUuid()).toURL();
+            String serverUrl = Main.getSettings().getServerAddress();
+            URL url = URI.create(serverUrl + (serverUrl.charAt(serverUrl.length() - 1) == '/' ? "" : "/") + "upload?uuid=" + Main.getSettings().getUuid()).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
             conn.setRequestMethod("GET");

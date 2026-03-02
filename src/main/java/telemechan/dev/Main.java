@@ -238,15 +238,17 @@ public class Main {
         container.setDefaultMaxBinaryMessageBufferSize(1024 * 1024);
         container.setDefaultMaxTextMessageBufferSize(1024 * 1024);
 
-        String url;
-        if(settings.getServerAddress().contains("https://")) {
-            url = "wss://" + settings.getServerAddress() + "/";
+        String wssUrl;
+        String serverUrl = settings.getServerAddress();
+        String lastChar = serverUrl.charAt(serverUrl.length() - 1) == '/' ? "ws" : "/ws";
+        if(serverUrl.contains("https://")) {
+            wssUrl = "wss://" + serverUrl.replace("https://", "") + lastChar;
         }else {
-            url = "ws://" + settings.getServerAddress() + "/";
+            wssUrl = "ws://" + serverUrl.replace("http://", "") + lastChar;
         }
 
         try {
-            session = container.connectToServer(WebsocketReceiver.class, URI.create(url));
+            session = container.connectToServer(WebsocketReceiver.class, URI.create(wssUrl));
         } catch (DeploymentException | IOException e) {
             e.printStackTrace();
         }
