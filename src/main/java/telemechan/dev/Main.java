@@ -89,7 +89,8 @@ public class Main {
         mainFrame.setLayout(new BorderLayout());
         mainFrame.getContentPane().setBackground(Color.BLACK);
 
-        mediaHandler = new MediaHandler(new MediaContainer(generatePlaceholder(), MediaType.IMAGE, -1));
+        generatePlaceholder();
+        mediaHandler = new MediaHandler(currentFile);
         currentComponent = mediaHandler.getMediaComponent(width, height);
         mainFrame.add(currentComponent, BorderLayout.CENTER);
 
@@ -206,7 +207,7 @@ public class Main {
         return folder;
     }
 
-    public static File generatePlaceholder() {
+    public static void generatePlaceholder() {
         int width = mainFrame.getWidth();
         int height = mainFrame.getHeight();
 
@@ -228,7 +229,7 @@ public class Main {
             }
         }
 
-        return f;
+        currentFile = new MediaContainer(f, -1);
     }
 
     @SneakyThrows
@@ -245,6 +246,7 @@ public class Main {
         String wssUrl;
         String serverUrl = settings.getServerAddress();
         String lastChar = serverUrl.charAt(serverUrl.length() - 1) == '/' ? "ws" : "/ws";
+        
         if(serverUrl.contains("https://")) {
             wssUrl = "wss://" + serverUrl.replace("https://", "") + lastChar;
         }else {

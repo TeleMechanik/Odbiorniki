@@ -2,7 +2,9 @@ package telemechan.dev.media;
 
 public enum MediaType {
     IMAGE,
-    UNKNOWN, 
-    GIF, 
-    VIDEO
+    GIF,
+    VIDEO,
+    JS,
+    PDF,
+    JSZIP, UNKNOWN
 }

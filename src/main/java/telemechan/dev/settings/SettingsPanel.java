@@ -153,7 +153,8 @@ public class SettingsPanel extends JDialog {
                 try {
                     Main.getSettings().saveData("defaultImgPath", file.getCanonicalPath());
                     Main.getSettings().reloadConfig();
-                    Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
+                    Main.generatePlaceholder();
+                    Main.updateMainFrame(Main.getCurrentFile());
                 }catch (Exception _){}
             }
         });
@@ -206,6 +207,19 @@ public class SettingsPanel extends JDialog {
         );
 
         fileChooser.addChoosableFileFilter(videoFilter);
+
+        FileNameExtensionFilter pdfFilter = new FileNameExtensionFilter(
+                "PDF files", "pdf"
+        );
+
+        fileChooser.addChoosableFileFilter(pdfFilter);
+
+        FileNameExtensionFilter pluginFilter = new FileNameExtensionFilter(
+                "Plugins", "zip", "js"
+        );
+
+        fileChooser.addChoosableFileFilter(pluginFilter);
+
         fileChooser.setAcceptAllFileFilterUsed(false);
         return fileChooser;
     }

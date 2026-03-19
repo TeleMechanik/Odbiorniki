@@ -34,9 +34,11 @@ public class Scheduler {
 
             filesInTimeRange.sort(null);
 
-
             if (filesInTimeRange.isEmpty()) {
-                Main.updateMainFrame(new MediaContainer(Main.generatePlaceholder(), -1));
+                if(Main.currentFile.getPriority() == -1) return;
+
+                Main.generatePlaceholder();
+                Main.updateMainFrame(Main.getCurrentFile());
                 return;
             }
 

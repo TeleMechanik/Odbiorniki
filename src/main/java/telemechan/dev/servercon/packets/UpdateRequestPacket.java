@@ -26,6 +26,12 @@ public class UpdateRequestPacket extends BasePacket{
             System.out.println("Trying to download the file needed...");
 
             String serverUrl = Main.getSettings().getServerAddress();
+            System.out.println("Server URL: " + serverUrl);
+
+            if(!serverUrl.contains("https://")) {
+                serverUrl = "http://" + serverUrl.replace("http://", "");
+            }
+
             URL url = URI.create(serverUrl + (serverUrl.charAt(serverUrl.length() - 1) == '/' ? "" : "/") + "upload?uuid=" + Main.getSettings().getUuid()).toURL();
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 

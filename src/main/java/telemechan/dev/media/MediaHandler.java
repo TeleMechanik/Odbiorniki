@@ -1,5 +1,8 @@
 package telemechan.dev.media;
 
+import telemechan.dev.media.customtypes.jspane.JSPanel;
+import telemechan.dev.media.customtypes.jspane.JSPluginLoader;
+import telemechan.dev.media.customtypes.pdf.AutoScrollingPDFComponent;
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent;
 
 import javax.imageio.ImageIO;
@@ -73,6 +76,23 @@ public class MediaHandler {
                 mediaPlayerComponent.setPreferredSize(new Dimension(width, height));
                 mediaPlayerComponent.setFocusable(false);
                 return mediaPlayerComponent;
+            case JS:
+                return new JSPanel(mediaContainer.getFile(), width, height);
+            case JSZIP:
+                try {
+                    // Extract and get the entry point
+                    File mainJs = JSPluginLoader.preparePlugin(mediaContainer.getFile());
+
+                    // Return your component, passing the main.js file
+                    // The component will use mainJs.getParent() for its IO base directory
+                    return new JSPanel(mainJs, width, height);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return new JLabel("Error loading JS Plugin: " + e.getMessage());
+                }
+
+            case PDF:
+                return new AutoScrollingPDFComponent(mediaContainer.getFile(), width, height);
             default:
                 return new JLabel("Unsupported media");
         }
@@ -81,13 +101,29 @@ public class MediaHandler {
     public static MediaType getType(File file){
         String name = file.getName();
         int dot = name.lastIndexOf('.');
-        String ext = (dot == -1) ? "" : name.substring(dot + 1);
+        String ext;
+
+        if (dot != -1) {
+            String[] nameParts = name.split("\\.");
+            ext = nameParts[nameParts.length - 1];
+        }else{
+            ext = "";
+        }
 
         MediaType type;
         switch (ext.toLowerCase()) {
             case  "jpg", "jpeg", "png" -> type = MediaType.IMAGE;
             case  "gif" -> type = MediaType.GIF;
+            case  "pdf" -> type = MediaType.PDF;
             case  "mp4", "mov" -> type = MediaType.VIDEO;
+            case  "js" -> type = MediaType.JS;
+            case  "zip" -> {
+                if(name.contains("plugin")){
+                    type = MediaType.JSZIP;
+                }else{
+                    type = MediaType.UNKNOWN;
+                }
+            }
             default -> type = MediaType.UNKNOWN;
         }
 
