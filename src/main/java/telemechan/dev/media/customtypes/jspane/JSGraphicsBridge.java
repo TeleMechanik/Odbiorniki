@@ -5,6 +5,7 @@ import org.graalvm.polyglot.HostAccess;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ public class JSGraphicsBridge {
 
     @HostAccess.Export
     public void fillRectRotated(double x, double y, double w, double h, double radians, String hexColor) {
-        var oldTransform = g2d.getTransform();
+        AffineTransform oldTransform = g2d.getTransform();
 
         g2d.translate(x, y);
         g2d.rotate(radians);

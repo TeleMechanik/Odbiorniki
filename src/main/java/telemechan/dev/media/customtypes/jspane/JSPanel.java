@@ -33,6 +33,7 @@ public class JSPanel extends JPanel {
                     .build();
 
             this.context = Context.newBuilder("js")
+                    .hostClassLoader(Thread.currentThread().getContextClassLoader())
                     .allowHostAccess(HostAccess.ALL)
                     .allowIO(ioConfig)
                     .allowExperimentalOptions(true)
