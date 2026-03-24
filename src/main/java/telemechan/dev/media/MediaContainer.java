@@ -8,17 +8,20 @@ public class MediaContainer implements Comparable<MediaContainer>{
     private final File file;
     private final MediaType type;
     private final int priority;
+    private final String id;
 
-    public MediaContainer(File file, MediaType type, int priority) {
+    public MediaContainer(File file, MediaType type, int priority, String id) {
         this.file = file;
         this.type = type;
         this.priority = priority;
+        this.id = id;
     }
 
-    public MediaContainer(File file, int priority){
+    public MediaContainer(File file, int priority, String id){
         this.file = file;
         this.type = MediaHandler.getType(file);
         this.priority = priority;
+        this.id = id;
     }
 
     @Override

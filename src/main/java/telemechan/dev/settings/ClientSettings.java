@@ -113,7 +113,7 @@ public class ClientSettings {
 
             int priority = entry.path("priority").asInt();
 
-            MediaContainer mediaContainer = new MediaContainer(new File(filePath), priority);
+            MediaContainer mediaContainer = new MediaContainer(new File(filePath), priority, filename);
 
             MediaHandler.preloadedMedia.put(fileName, mediaContainer);
 

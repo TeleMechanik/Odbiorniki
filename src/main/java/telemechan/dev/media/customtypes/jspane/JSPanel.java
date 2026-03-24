@@ -48,6 +48,25 @@ public class JSPanel extends JPanel {
             context.getBindings("js").putMember("screenWidth", width);
             context.getBindings("js").putMember("screenHeight", height);
             context.getBindings("js").putMember("gfx", bridge);
+            context.getBindings("js").putMember("__javaFetch", new JSFetchBridge());
+
+            context.eval("js", """
+                    globalThis.fetch = async (url) => {
+        const bytes = __javaFetch.sendRequest(url);
+            if (!bytes) throw new Error("Network request failed");
+
+            // Use the Java bridge to decode the bytes into a string
+        const decodedString = __javaFetch.decode(bytes);
+
+            return {
+                    ok: true,
+                    text: async () => decodedString,
+                    json: async () => JSON.parse(decodedString),
+                    // If you still need raw data for other things:
+                    arrayBuffer: async () => bytes
+        };
+    };
+""");
 
             context.eval("js", scriptCode);
 
@@ -79,6 +98,10 @@ public class JSPanel extends JPanel {
             });
             animationTimer.start();
         }
+    }
+
+    public void stopAnimation(){
+        animationTimer.stop();
     }
 
     @Override

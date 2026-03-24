@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -45,7 +46,7 @@ public class Scheduler {
             MediaContainer highest = filesInTimeRange.getFirst();
 
             if(highest.getPriority() > 0) {
-                if (highest == Main.getCurrentFile()) {
+                if (Objects.equals(highest.getId(), Main.getCurrentFile().getId())) {
                     return;
                 }
 
@@ -53,7 +54,8 @@ public class Scheduler {
                 counter.set(0);
             }else{
                 if (counter.get() > 9){
-                    Main.updateMainFrame(filesInTimeRange.get(new Random().nextInt(filesInTimeRange.size())));
+                    List<MediaContainer> filteredFilesInTimeRange = filesInTimeRange.stream().filter(file -> !Objects.equals(file.getId(), Main.getCurrentFile().getId())).toList();
+                    Main.updateMainFrame(filteredFilesInTimeRange.get(new Random().nextInt(filteredFilesInTimeRange.size())));
                     counter.set(0);
                 }else {
                     counter.incrementAndGet();

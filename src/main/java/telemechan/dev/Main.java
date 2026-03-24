@@ -10,6 +10,7 @@ import lombok.SneakyThrows;
 import telemechan.dev.media.MediaContainer;
 import telemechan.dev.media.MediaHandler;
 import telemechan.dev.media.MediaType;
+import telemechan.dev.media.customtypes.jspane.JSPanel;
 import telemechan.dev.servercon.WebsocketReceiver;
 import telemechan.dev.servercon.PacketHandler;
 import telemechan.dev.servercon.PacketParser;
@@ -153,8 +154,12 @@ public class Main {
             if(currentComponent instanceof EmbeddedMediaPlayerComponent component){
                 component.mediaPlayer().controls().stop();
             }
+            if (currentComponent instanceof JSPanel panel){
+                panel.stopAnimation();
+            }
             mainFrame.getContentPane().remove(currentComponent);
         }
+
         currentFile = mediaContainer;
         mediaHandler = new MediaHandler(mediaContainer);
         currentComponent = mediaHandler.getMediaComponent(width, height);
@@ -229,7 +234,7 @@ public class Main {
             }
         }
 
-        currentFile = new MediaContainer(f, -1);
+        currentFile = new MediaContainer(f, -1, "placeholder");
     }
 
     @SneakyThrows
